@@ -27,3 +27,7 @@ def get_copper_price():
     
     except Exception as e:
         return jsonify({'error': str(e)})
+
+# ✅ REQUIRED to run the app on Render
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
