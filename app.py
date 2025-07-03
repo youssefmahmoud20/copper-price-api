@@ -6,24 +6,24 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return 'Copper API (Bloomberg) is running!'
+    return 'Copper API (Metal.com) is running!'
 
 @app.route('/get-copper-price')
 def get_copper_price():
     try:
-        url = 'https://www.bloomberg.com/quote/LMCADS03:COM?embedded-checkout=true'
+        url = 'https://www.metal.com/en/future/LME_CA_3M'
         headers = {'User-Agent': 'Mozilla/5.0'}
 
         response = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        price_element = soup.find('div', class_='sized-price media-ui-SizedPrice_extraLarge-05pKbJRbUH8- media-ui-SizedPrice_tabular-THpKTXeBUGw-')
-        
-        if price_element:
-            price = price_element.text.strip()
-            return jsonify({'price': price})
+        price_elements = soup.find_all('span', class_='FuturePriceDetail_value__MsdBq')
+
+        if len(price_elements) >= 5:
+            copper_price = price_elements[4].text.strip()
+            return jsonify({'price': copper_price})
         else:
-            return jsonify({'error': 'Copper price not found'})
+            return jsonify({'error': f'Found only {len(price_elements)} elements. Expected at least 5.'})
     except Exception as e:
         return jsonify({'error': str(e)})
 
